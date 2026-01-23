@@ -14,23 +14,23 @@ A machine learning web application that predicts the probability of diabetes ris
 
 | Model | Accuracy | Status |
 |-------|----------|--------|
-| Logistic Regression | 73% | Baseline |
-| Random Forest | **76%** | ✅ **Production** |
-| Neural Network | 76% | Alternative |
+| Logistic Regression | ~73% | Baseline |
+| Random Forest | **~76%** | ✅ **Production** |
+| Neural Network | ~76% | Experimental |
 
-**Selected Model:** Random Forest (best balance of accuracy, simplicity, and deployment efficiency)
+**Selected Model:** Random Forest – achieves production-level accuracy (~76%) with simpler deployment compared to the experimental neural network while maintaining strong performance
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.9 or higher
+- Python 3.x (tested on 3.13)
 - pip or conda
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/ai-health-predictor.git
+   git clone https://github.com/odwamanitshana/ai-health-predictor.git
    cd ai-health-predictor
    ```
 
@@ -71,7 +71,7 @@ The app will open at `http://localhost:8501`
 
 3. View results:
    - Diabetes probability (percentage)
-   - Risk category (High/Low)
+   - Risk message based on the probability
    - Medical disclaimer
 
 ## 📁 Project Structure
@@ -123,7 +123,7 @@ ai-health-predictor/
 Key packages:
 - **streamlit** - Web application framework
 - **scikit-learn** - Machine learning models
-- **tensorflow/keras** - Deep learning framework
+- **tensorflow/keras** - Deep learning framework (for the experimental neural network model)
 - **pandas** - Data manipulation
 - **numpy** - Numerical computing
 - **joblib** - Model serialization
@@ -134,7 +134,7 @@ See `requirements.txt` for complete list.
 
 The app is deployed on **Streamlit Cloud** and connected to this GitHub repository.
 
-**Live App:** [Streamlit Cloud Link - Add your URL here]
+**Live App:** [AI Health Predictor on Streamlit Cloud](https://ai-health-predictor-i8szxik9c7k6sgeilydpui.streamlit.app/)
 
 ### Deploying Your Own Version
 
