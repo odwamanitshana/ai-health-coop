@@ -181,13 +181,127 @@ python tests/compare_app_notebook.py
 
 ## 🤝 Contributing
 
-Contributions are welcome! Here's how:
+We welcome contributions from the community! Whether you're fixing bugs, improving documentation, or adding new features, your help is appreciated.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/improvement`)
-3. Commit your changes (`git commit -am 'Add improvement'`)
-4. Push to the branch (`git push origin feature/improvement`)
-5. Open a Pull Request
+### Getting Started
+
+1. **Fork the repository**
+   - Click the "Fork" button at the top right of this repository
+   - This creates your own copy of the project
+
+2. **Clone your fork**
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/ai-health-coop.git
+   cd ai-health-coop
+   ```
+
+3. **Set up the development environment**
+   ```bash
+   # Create and activate virtual environment
+   python -m venv .venv
+   .venv\Scripts\activate  # Windows
+   source .venv/bin/activate  # macOS/Linux
+   
+   # Install dependencies
+   pip install -r requirements.txt
+   ```
+
+4. **Create a new branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   # or
+   git checkout -b fix/your-bug-fix
+   ```
+
+### Making Changes
+
+1. **Make your changes**
+   - Write clear, concise code
+   - Follow existing code style and conventions
+   - Add comments where necessary
+
+2. **Test your changes**
+   ```bash
+   # Run the app locally
+   streamlit run app.py
+   
+   # Run tests if available
+   python tests/compare_app_notebook.py
+   ```
+
+3. **Commit your changes**
+   ```bash
+   git add .
+   git commit -m "Clear description of your changes"
+   ```
+   
+   **Commit Message Guidelines:**
+   - Use present tense ("Add feature" not "Added feature")
+   - Be descriptive but concise
+   - Reference issue numbers if applicable
+
+### Submitting Changes
+
+1. **Push to your fork**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+2. **Create a Pull Request**
+   - Go to the original repository on GitHub
+   - Click "New Pull Request"
+   - Select your fork and branch
+   - Fill in the PR template with:
+     - Clear description of changes
+     - Related issue numbers
+     - Screenshots (if UI changes)
+     - Testing performed
+
+3. **Wait for review**
+   - Maintainers will review your PR
+   - Address any requested changes
+   - Once approved, your PR will be merged!
+
+### Contribution Guidelines
+
+**Code Quality:**
+- Write clean, readable code
+- Follow Python PEP 8 style guidelines
+- Add docstrings to functions and classes
+- Keep functions focused and modular
+
+**Documentation:**
+- Update README.md if you change functionality
+- Comment complex logic
+- Update requirements.txt if adding dependencies
+
+**Testing:**
+- Test your changes thoroughly
+- Ensure existing functionality still works
+- Add tests for new features when possible
+
+**Types of Contributions:**
+- 🐛 Bug fixes
+- ✨ New features
+- 📝 Documentation improvements
+- 🎨 UI/UX enhancements
+- ⚡ Performance improvements
+- 🧪 Adding tests
+- 🔧 Configuration improvements
+
+### Getting Help
+
+- 💬 Join discussions in the Issues section
+- 📧 Reach out to maintainers for questions
+- 📖 Check existing documentation and code examples
+
+### Code of Conduct
+
+- Be respectful and inclusive
+- Provide constructive feedback
+- Help create a welcoming environment for all contributors
+
+Thank you for contributing to AI Health Predictor! 🎉
 
 ## 📚 Documentation
 
