@@ -1,14 +1,62 @@
+import logging
 import os
+import traceback
 
 import joblib
 import numpy as np
 import streamlit as st
 from tensorflow import keras
 
+logger = logging.getLogger(__name__)
+
 # --------------------------
 # Load models with error handling
 # --------------------------
 MODELS_DIR = "models"
+
+RISK_TIER_VERY_HIGH = 0.75
+RISK_TIER_HIGH = 0.5
+RISK_TIER_MODERATE = 0.25
+
+
+def risk_tier_display(probability: float) -> tuple[str, str, str]:
+    """Map probability to label, Streamlit alert kind, and user-facing message."""
+    if probability >= RISK_TIER_VERY_HIGH:
+        return (
+            "Very high",
+            "error",
+            "Very High Risk — Strong indication of diabetes. Immediate medical consultation recommended.",
+        )
+    if probability >= RISK_TIER_HIGH:
+        return (
+            "High",
+            "warning",
+            "High Risk — Elevated probability of diabetes. Medical evaluation advised.",
+        )
+    if probability >= RISK_TIER_MODERATE:
+        return (
+            "Moderate",
+            "info",
+            "Moderate Risk — Some indicators present. Consider lifestyle changes and monitoring.",
+        )
+    return (
+        "Low",
+        "success",
+        "Low Risk — Low probability of diabetes based on current metrics.",
+    )
+
+
+def show_risk_message(probability: float) -> None:
+    label, kind, message = risk_tier_display(probability)
+    del label
+    if kind == "error":
+        st.error(f"**{message}**")
+    elif kind == "warning":
+        st.warning(f"**{message}**")
+    elif kind == "info":
+        st.info(f"**{message}**")
+    else:
+        st.success(f"**{message}**")
 
 
 @st.cache_resource
@@ -52,22 +100,32 @@ def load_models():
     return models, scaler
 
 
+st.set_page_config(
+    page_title="Diabetes Model Comparison · Odwa Manitshana",
+    page_icon="assets/favicon.png",
+    layout="wide",
+)
+
 models, scaler = load_models()
 
 # --------------------------
 # Streamlit UI
 # --------------------------
-st.title("🏥 Diabetes Risk Predictor")
+st.title("Diabetes Model Comparison")
 
 st.write(
-    "Enter patient information below. The model will estimate the probability "
-    "that this patient has diabetes based on the Pima Indians Diabetes Dataset."
+    "Enter patient information below. Compare Random Forest, Logistic Regression, "
+    "and a small neural network on the same inputs and see how diabetes-risk "
+    "estimates differ (Pima Indians Diabetes Dataset)."
 )
 
 # Model selection
-st.sidebar.header("⚙️ Model Settings")
+st.sidebar.header("Model settings")
 selected_model = st.sidebar.selectbox(
-    "Select Model", options=list(models.keys()), index=0, help="Choose which machine learning model to use for prediction"
+    "Select Model",
+    options=list(models.keys()),
+    index=0,
+    help="Choose which machine learning model to use for prediction",
 )
 
 # Display model info
@@ -86,7 +144,12 @@ col1, col2 = st.columns(2)
 with col1:
     pregnancies = st.number_input("Pregnancies", min_value=0, max_value=20, value=1, step=1)
     glucose = st.number_input(
-        "Glucose (mg/dL)", min_value=1, max_value=300, value=120, step=1, help="Blood glucose level. Must be greater than 0."
+        "Glucose (mg/dL)",
+        min_value=1,
+        max_value=300,
+        value=120,
+        step=1,
+        help="Blood glucose level. Must be greater than 0.",
     )
     blood_pressure = st.number_input("Blood Pressure (mmHg)", min_value=0, max_value=200, value=70, step=1)
     skin_thickness = st.number_input("Skin Thickness (mm)", min_value=0, max_value=100, value=20, step=1)
@@ -119,16 +182,16 @@ def validate_inputs(glucose, bmi, blood_pressure, age):
     errors = []
 
     if glucose <= 0:
-        errors.append("⚠️ Glucose level must be greater than 0")
+        errors.append("Glucose level must be greater than 0")
 
     if bmi <= 0:
-        errors.append("⚠️ BMI must be greater than 0")
+        errors.append("BMI must be greater than 0")
 
     if blood_pressure <= 0:
-        errors.append("⚠️ Blood Pressure should be greater than 0 for accurate prediction")
+        errors.append("Blood Pressure should be greater than 0 for accurate prediction")
 
     if age <= 0:
-        errors.append("⚠️ Age must be greater than 0")
+        errors.append("Age must be greater than 0")
 
     return errors
 
@@ -177,11 +240,15 @@ if st.button("Predict", type="primary", use_container_width=True):
             pred_class = 1 if prob_diabetes >= 0.5 else 0
         else:
             prob_diabetes = model.predict_proba(X_for_prediction)[0, 1]
-            pred_class = model.predict(X_for_prediction)[0]
+            pred_class = int(model.predict(X_for_prediction)[0])
+
+        _ = pred_class  # 0.5 threshold; risk metric and messages use probability tiers
+
+        risk_label, _, _ = risk_tier_display(prob_diabetes)
 
         # Display results with enhanced UX
         st.markdown("---")
-        st.subheader("📊 Prediction Results")
+        st.subheader("Prediction results")
 
         # Display probability with metrics
         col_metric1, col_metric2, col_metric3 = st.columns(3)
@@ -194,33 +261,26 @@ if st.button("Predict", type="primary", use_container_width=True):
             )
 
         with col_metric2:
-            st.metric(label="Risk Level", value="HIGH" if pred_class == 1 else "LOW")
+            st.metric(label="Risk level", value=risk_label)
 
         with col_metric3:
-            st.metric(label="Model Used", value=selected_model.split()[0])
+            st.metric(label="Model used", value=selected_model)
 
         # Visual probability bar
-        st.write("**Risk Assessment:**")
+        st.write("**Risk assessment**")
         st.progress(prob_diabetes)
 
-        # Risk interpretation
-        if prob_diabetes >= 0.75:
-            st.error("🔴 **Very High Risk** - Strong indication of diabetes. Immediate medical consultation recommended.")
-        elif prob_diabetes >= 0.5:
-            st.warning("🟡 **High Risk** - Elevated probability of diabetes. Medical evaluation advised.")
-        elif prob_diabetes >= 0.25:
-            st.info("🔵 **Moderate Risk** - Some indicators present. Consider lifestyle changes and monitoring.")
-        else:
-            st.success("🟢 **Low Risk** - Low probability of diabetes based on current metrics.")
+        show_risk_message(prob_diabetes)
 
         # Medical disclaimer
         st.markdown("---")
         st.caption(
-            "⚕️ **Medical Disclaimer:** This tool is for educational and research purposes only. "
+            "**Medical disclaimer:** This tool is for educational and research purposes only. "
             "It is **NOT** a substitute for professional medical advice, diagnosis, or treatment. "
             "Always consult with qualified healthcare professionals for medical decisions."
         )
 
-    except Exception as e:
-        st.error(f"An error occurred during prediction: {e}")
-        st.exception(e)
+    except Exception:
+        traceback.print_exc()
+        logger.exception("Prediction failed")
+        st.error("Prediction failed. Check inputs or try another model.")
