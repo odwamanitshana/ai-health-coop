@@ -19,21 +19,21 @@ def load_models():
     # Load Random Forest
     try:
         rf_path = os.path.join(MODELS_DIR, "random_forest.pkl")
-        models['Random Forest'] = joblib.load(rf_path)
+        models["Random Forest"] = joblib.load(rf_path)
     except Exception as e:
         st.warning(f"Could not load Random Forest model: {e}")
 
     # Load Logistic Regression
     try:
         lr_path = os.path.join(MODELS_DIR, "logistic_regression.pkl")
-        models['Logistic Regression'] = joblib.load(lr_path)
+        models["Logistic Regression"] = joblib.load(lr_path)
     except Exception as e:
         st.warning(f"Could not load Logistic Regression model: {e}")
 
     # Load Neural Network
     try:
         nn_path = os.path.join(MODELS_DIR, "diabetes_nn.keras")
-        models['Neural Network'] = keras.models.load_model(nn_path)
+        models["Neural Network"] = keras.models.load_model(nn_path)
     except Exception as e:
         st.warning(f"Could not load Neural Network model: {e}")
 
@@ -51,6 +51,7 @@ def load_models():
 
     return models, scaler
 
+
 models, scaler = load_models()
 
 # --------------------------
@@ -66,17 +67,14 @@ st.write(
 # Model selection
 st.sidebar.header("⚙️ Model Settings")
 selected_model = st.sidebar.selectbox(
-    "Select Model",
-    options=list(models.keys()),
-    index=0,
-    help="Choose which machine learning model to use for prediction"
+    "Select Model", options=list(models.keys()), index=0, help="Choose which machine learning model to use for prediction"
 )
 
 # Display model info
 model_info = {
-    'Random Forest': "Best overall performance (~76% accuracy). Does not require feature scaling.",
-    'Logistic Regression': "Baseline model (~73% accuracy). Fast and interpretable.",
-    'Neural Network': "Deep learning model (~76% accuracy). Experimental."
+    "Random Forest": "Best overall performance (~76% accuracy). Does not require feature scaling.",
+    "Logistic Regression": "Baseline model (~73% accuracy). Fast and interpretable.",
+    "Neural Network": "Deep learning model (~76% accuracy). Experimental.",
 }
 
 if selected_model in model_info:
@@ -88,36 +86,13 @@ col1, col2 = st.columns(2)
 with col1:
     pregnancies = st.number_input("Pregnancies", min_value=0, max_value=20, value=1, step=1)
     glucose = st.number_input(
-        "Glucose (mg/dL)",
-        min_value=1,
-        max_value=300,
-        value=120,
-        step=1,
-        help="Blood glucose level. Must be greater than 0."
+        "Glucose (mg/dL)", min_value=1, max_value=300, value=120, step=1, help="Blood glucose level. Must be greater than 0."
     )
-    blood_pressure = st.number_input(
-        "Blood Pressure (mmHg)",
-        min_value=0,
-        max_value=200,
-        value=70,
-        step=1
-    )
-    skin_thickness = st.number_input(
-        "Skin Thickness (mm)",
-        min_value=0,
-        max_value=100,
-        value=20,
-        step=1
-    )
+    blood_pressure = st.number_input("Blood Pressure (mmHg)", min_value=0, max_value=200, value=70, step=1)
+    skin_thickness = st.number_input("Skin Thickness (mm)", min_value=0, max_value=100, value=20, step=1)
 
 with col2:
-    insulin = st.number_input(
-        "Insulin (mIU/mL)",
-        min_value=0,
-        max_value=1000,
-        value=80,
-        step=1
-    )
+    insulin = st.number_input("Insulin (mIU/mL)", min_value=0, max_value=1000, value=80, step=1)
     bmi = st.number_input(
         "BMI (kg/m²)",
         min_value=1.0,
@@ -125,7 +100,7 @@ with col2:
         value=25.0,
         step=0.1,
         format="%.1f",
-        help="Body Mass Index. Must be greater than 0."
+        help="Body Mass Index. Must be greater than 0.",
     )
     dpf = st.number_input(
         "Diabetes Pedigree Function",
@@ -134,15 +109,10 @@ with col2:
         value=0.5,
         step=0.01,
         format="%.2f",
-        help="Genetic likelihood of diabetes based on family history"
+        help="Genetic likelihood of diabetes based on family history",
     )
-    age = st.number_input(
-        "Age (years)",
-        min_value=1,
-        max_value=120,
-        value=33,
-        step=1
-    )
+    age = st.number_input("Age (years)", min_value=1, max_value=120, value=33, step=1)
+
 
 def validate_inputs(glucose, bmi, blood_pressure, age):
     """Validate critical inputs."""
@@ -191,7 +161,7 @@ if st.button("Predict", type="primary", use_container_width=True):
         model = models[selected_model]
 
         # Apply scaling for models that need it
-        if selected_model in ['Logistic Regression', 'Neural Network']:
+        if selected_model in ["Logistic Regression", "Neural Network"]:
             if scaler is None:
                 st.error("Scaler not available. Cannot use this model.")
                 st.stop()
@@ -202,7 +172,7 @@ if st.button("Predict", type="primary", use_container_width=True):
             X_for_prediction = X_input
 
         # Make prediction
-        if selected_model == 'Neural Network':
+        if selected_model == "Neural Network":
             prob_diabetes = float(model.predict(X_for_prediction, verbose=0)[0][0])
             pred_class = 1 if prob_diabetes >= 0.5 else 0
         else:
@@ -220,20 +190,14 @@ if st.button("Predict", type="primary", use_container_width=True):
             st.metric(
                 label="Diabetes Probability",
                 value=f"{prob_diabetes:.1%}",
-                delta=f"{prob_diabetes - 0.5:.1%} from threshold" if abs(prob_diabetes - 0.5) > 0.05 else None
+                delta=f"{prob_diabetes - 0.5:.1%} from threshold" if abs(prob_diabetes - 0.5) > 0.05 else None,
             )
 
         with col_metric2:
-            st.metric(
-                label="Risk Level",
-                value="HIGH" if pred_class == 1 else "LOW"
-            )
+            st.metric(label="Risk Level", value="HIGH" if pred_class == 1 else "LOW")
 
         with col_metric3:
-            st.metric(
-                label="Model Used",
-                value=selected_model.split()[0]
-            )
+            st.metric(label="Model Used", value=selected_model.split()[0])
 
         # Visual probability bar
         st.write("**Risk Assessment:**")
