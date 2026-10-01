@@ -136,7 +136,7 @@ model_info = {
 }
 
 if selected_model in model_info:
-    st.sidebar.info(f"**{selected_model}**: {model_info[selected_model]}")
+    st.sidebar.caption(f"**{selected_model}**: {model_info[selected_model]}")
 
 
 col1, col2 = st.columns(2)
@@ -249,22 +249,15 @@ if st.button("Predict", type="primary", use_container_width=True):
         # Display results with enhanced UX
         st.markdown("---")
         st.subheader("Prediction results")
+        st.caption(f"Model: {selected_model}")
 
-        # Display probability with metrics
-        col_metric1, col_metric2, col_metric3 = st.columns(3)
+        col_metric1, col_metric2 = st.columns(2)
 
         with col_metric1:
-            st.metric(
-                label="Diabetes Probability",
-                value=f"{prob_diabetes:.1%}",
-                delta=f"{prob_diabetes - 0.5:.1%} from threshold" if abs(prob_diabetes - 0.5) > 0.05 else None,
-            )
+            st.metric(label="Diabetes Probability", value=f"{prob_diabetes:.1%}")
 
         with col_metric2:
             st.metric(label="Risk level", value=risk_label)
-
-        with col_metric3:
-            st.metric(label="Model used", value=selected_model)
 
         # Visual probability bar
         st.write("**Risk assessment**")

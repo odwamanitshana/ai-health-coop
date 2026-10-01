@@ -8,3 +8,6 @@ font = "sans serif"
 codeFont = "monospace"
 borderColor = "#E2E0DA"
 baseRadius = "6px"
+
+[client]
+toolbarMode = "minimal"
